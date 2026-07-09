@@ -1,0 +1,20 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index",
+    "build" : "tsc -p .",
+    "watch" : "tsc-watch",
+    "dev" : "tsc-watch --onSuccess \"node dist/index\""
+  },
+  "devDependencies": {
+    "@types/typescript": "^0.4.29",
+    "tsc-watch": "^7.2.1",
+    "typescript": "^7.0.2"
+  }
+}
