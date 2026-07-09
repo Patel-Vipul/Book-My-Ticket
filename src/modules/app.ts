@@ -1,15 +1,19 @@
 import express from "express";
 import type { Express } from "express";
+import authRouter from "./auth/auth.route.js";
+import errorHandler from "../common/middleware/errorHandler.js";
 
-const expressApplication = ():Express => {
-    const app = express();
+const expressApplication = (): Express => {
+  const app = express();
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-    app.use("/health", (req,res) => {
-        res.status(200).json({success : true, message : "welcome to my server"});
-        return
-    })
+  //auth router
+  app.use("/auth", authRouter);
 
-    return app;
-}
+  app.use(errorHandler)
 
-export default expressApplication
+  return app;
+};
+
+export default expressApplication;
