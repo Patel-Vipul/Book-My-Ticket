@@ -1,7 +1,11 @@
 import pool from "../../common/config/database/db.js";
 import ApiError from "../../common/utils/api.error.js";
-import { hashToken,verifyToken } from "../../common/utils/hashToken.js";
+import { hashToken, verifyToken } from "../../common/utils/hashToken.js";
 import crypto from "crypto";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../../common/utils/token.jwt.js";
 
 const registerService = async (payload) => {
   const { firstName, lastName, email, password, role } = payload;
@@ -48,9 +52,34 @@ const loginService = async (payload) => {
   `;
 
   const userResult = await pool.query(checkUserQuery, [email]);
-  if(userResult.rows.length === 0){
-    throw ApiError.unauthorized("Invalid email or password")
+  if (userResult.rows.length === 0) {
+    throw ApiError.unauthorized("Invalid email or password");
   }
+
+  const user = userResult.rows[0];
+
+  const isPassword = await verifyToken(password, user.password_hash);
+
+  if (!isPassword) {
+    throw ApiError.unauthorized("Invalid email or password");
+  }
+
+  const accessToken = generateAccessToken({ id: user.id, email });
+  const refreshToken = generateRefreshToken({ id: user.id });
+
+  const hashedRefreshToken = await hashToken(refreshToken)
+
+  const updateUserQuery = 'UPDATE users SET refresh_token=$1 WHERE id=$2'
+  await pool.query(updateUserQuery, [hashedRefreshToken, user.id])
+
+  const safeUser = {
+    first_name : user.first_name,
+    last_name : user.last_name,
+    email : email,
+    role : user.role
+  }
+
+  return { safeUser, accessToken, refreshToken }
 };
 
-export { registerService };
+export { registerService,loginService };

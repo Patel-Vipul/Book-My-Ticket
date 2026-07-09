@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { email } from "zod";
 
 
 const registerDto = z.object({
@@ -36,7 +36,24 @@ const registerDto = z.object({
         .optional()
 });
 
+const loginDto = z.object({
+  email: z
+    .email("please enter a valid email address!")
+    .trim()
+    .toLowerCase()
+    .max(322, "email is too long!"),
+
+  password: z
+    .string()
+    // .min(8, "Password must be at least 8 characters")
+    // .max(16, "Password must be under 16 characters")
+    // .regex(/[a-z]/, "Must contain at least one lowercase letter")
+    // .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+    // .regex(/[0-9]/, "Must contain at least one number")
+    // .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character"),
+})
 
 export {
-    registerDto
+    registerDto,
+    loginDto
 }

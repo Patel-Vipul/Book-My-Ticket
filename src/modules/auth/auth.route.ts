@@ -6,5 +6,5 @@ const authRouter = Router();
 
 authRouter.post("/register", asyncHandler(AuthController.registerController))
 
-
+authRouter.post("/login",asyncHandler(AuthController.loginController))
 export default authRouter
