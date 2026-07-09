@@ -1,6 +1,6 @@
 import pool from "../../common/config/database/db.js";
 import ApiError from "../../common/utils/api.error.js";
-import { hashPassword } from "../../common/utils/hashPassword.js";
+import { hashToken,verifyToken } from "../../common/utils/hashToken.js";
 import crypto from "crypto";
 
 const registerService = async (payload) => {
@@ -13,7 +13,7 @@ const registerService = async (payload) => {
     throw ApiError.conflict("User already registered!");
   }
 
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashToken(password);
   const id = crypto.randomUUID();
 
   const insertUserQuery = `
@@ -36,6 +36,21 @@ const registerService = async (payload) => {
   }
 
   return userResult.rows[0];
+};
+
+const loginService = async (payload) => {
+  const { email, password } = payload;
+
+  const checkUserQuery = `
+    SELECT id,first_name,last_name, password_hash, role 
+    FROM users 
+    WHERE email=$1
+  `;
+
+  const userResult = await pool.query(checkUserQuery, [email]);
+  if(userResult.rows.length === 0){
+    throw ApiError.unauthorized("Invalid email or password")
+  }
 };
 
 export { registerService };
