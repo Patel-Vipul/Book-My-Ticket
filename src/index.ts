@@ -1,12 +1,13 @@
 import http from "node:http"
 import "dotenv/config"
+import expressApplication from "./modules/app.js"
 
 const PORT = process.env.PORT || 8080
 
 async function main() {
     try {
         //creates a server
-        const server = http.createServer()
+        const server = http.createServer(expressApplication())
 
         //database connection
 
