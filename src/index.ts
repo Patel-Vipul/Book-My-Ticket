@@ -1,6 +1,7 @@
 import http from "node:http"
 import "dotenv/config"
 import expressApplication from "./modules/app.js"
+import pool from "./common/config/database/db.js"
 
 const PORT = process.env.PORT || 8080
 
@@ -10,6 +11,8 @@ async function main() {
         const server = http.createServer(expressApplication())
 
         //database connection
+        const result = await pool.query("SELECT NOW()")
+        console.log("Database is connected Successfully! \n", result.rows[0].now)
 
         //listen on port
         server.listen(PORT, () => {
