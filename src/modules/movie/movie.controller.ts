@@ -1,12 +1,15 @@
 import type { Request, Response } from "express";
-import { registerMovieDto } from "./movie.dto.js";
+import { patchMovieDto, putMovieDto, registerMovieDto } from "./movie.dto.js";
 import ApiError from "../../common/utils/api.error.js";
 import {
   getMovieByIdService,
   getMoviesService,
   getSeatsService,
   registerMovieService,
-  getSeatByIdService
+  getSeatByIdService,
+  updateMoviePutService,
+  updateMoviePatchService,
+  deleteMovieService,
 } from "./movie.service.js";
 import ApiResponse from "../../common/utils/api.response.js";
 
@@ -65,6 +68,62 @@ class MovieController {
     const seat = await getSeatByIdService(seatId);
 
     ApiResponse.ok(res, seat, "seat is fetched successfully!");
+    return;
+  }
+
+  static async updateMoviePutController(req: Request, res: Response) {
+    const validatedBody = await putMovieDto.safeParseAsync(req.body);
+
+    if (!validatedBody.success) {
+      throw ApiError.badRequest(
+        "unable to parse request body",
+        validatedBody.error.issues.map((issue) => issue.message),
+      );
+    }
+
+    //@ts-ignore
+    const userId = req?.user.user_id;
+    const movieId = req.params?.movieId;
+
+    const updatedMovie = await updateMoviePutService(
+      validatedBody.data,
+      movieId,
+      userId,
+    );
+
+    ApiResponse.ok(res, updatedMovie, "Movie is updated");
+  }
+
+  static async updateMoviePatchController(req: Request, res: Response) {
+    const validatedBody = await patchMovieDto.safeParseAsync(req.body);
+
+    if (!validatedBody.success) {
+      throw ApiError.badRequest(
+        "Unable to parse request body",
+        validatedBody.error.issues.map((issue) => issue.message),
+      );
+    }
+
+    //@ts-ignore
+    const userId = req?.user.user_id;
+    const movieId = req.params?.movieId;
+
+    const updatedMovie = await updateMoviePatchService(
+      validatedBody.data,
+      movieId,
+      userId,
+    );
+
+    ApiResponse.ok(res, updatedMovie, "Movie is updated");
+    return;
+  }
+
+  static async deleteMovieController(req: Request, res: Response) {
+    const movieId = req.params?.movieId;
+
+    await deleteMovieService(movieId);
+
+    ApiResponse.ok(res, [], "Movie is deleted successfully!");
     return;
   }
 }
