@@ -5,6 +5,7 @@ import crypto from "crypto";
 import {
   generateAccessToken,
   generateRefreshToken,
+  verifyRefreshToken,
 } from "../../common/utils/token.jwt.js";
 
 const registerService = async (payload) => {
@@ -67,19 +68,58 @@ const loginService = async (payload) => {
   const accessToken = generateAccessToken({ id: user.id, email });
   const refreshToken = generateRefreshToken({ id: user.id });
 
-  const hashedRefreshToken = await hashToken(refreshToken)
+  const hashedRefreshToken = await hashToken(refreshToken);
 
-  const updateUserQuery = 'UPDATE users SET refresh_token=$1 WHERE id=$2'
-  await pool.query(updateUserQuery, [hashedRefreshToken, user.id])
+  const updateUserQuery = "UPDATE users SET refresh_token=$1 WHERE id=$2";
+  await pool.query(updateUserQuery, [hashedRefreshToken, user.id]);
 
   const safeUser = {
-    first_name : user.first_name,
-    last_name : user.last_name,
-    email : email,
-    role : user.role
-  }
+    first_name: user.first_name,
+    last_name: user.last_name,
+    email: email,
+    role: user.role,
+  };
 
-  return { safeUser, accessToken, refreshToken }
+  return { safeUser, accessToken, refreshToken };
 };
 
-export { registerService,loginService };
+const refreshTokenService = async (payload) => {
+  const decoded = verifyRefreshToken(payload);
+
+  const findUserQuery =
+    "SELECT id, refresh_token, email FROM users WHERE id=$1";
+  const findUserResult = await pool.query(findUserQuery, [decoded.id]);
+
+  if (findUserResult.rows.length === 0) {
+    throw ApiError.unauthorized("invalid refresh token!");
+  }
+
+  const user = findUserResult.rows[0];
+
+  if (!user.refresh_token) {
+    throw ApiError.unauthorized("Session expired, please re-login!");
+  }
+
+  const isRefreshToken = await verifyToken(payload, user.refresh_token);
+
+  if (!isRefreshToken) {
+    throw ApiError.unauthorized(
+      "refresh token already used or expired, please re-login!",
+    );
+  }
+
+  const newAccessToken = generateAccessToken({
+    id: user.id,
+    email: user.email,
+  });
+  const newRefreshToken = generateRefreshToken({ id: user.id });
+
+  const hashedNewRefreshToken = await hashToken(newRefreshToken);
+
+  const updateUserQuery = `UPDATE users SET refresh_token=$1 WHERE id=$2`;
+  await pool.query(updateUserQuery, [hashedNewRefreshToken, user.id]);
+
+  return { newAccessToken, newRefreshToken };
+};
+
+export { registerService, loginService, refreshTokenService };
