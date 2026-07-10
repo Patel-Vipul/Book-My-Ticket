@@ -1,6 +1,5 @@
 import z, { email } from "zod";
 
-
 const registerDto = z.object({
   firstName: z
     .string()
@@ -22,18 +21,15 @@ const registerDto = z.object({
     .toLowerCase()
     .max(322, "email is too long!"),
 
-  password: z
-    .string()
-    // .min(8, "Password must be at least 8 characters")
-    // .max(16, "Password must be under 16 characters")
-    // .regex(/[a-z]/, "Must contain at least one lowercase letter")
-    // .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-    // .regex(/[0-9]/, "Must contain at least one number")
-    // .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character"),
+  password: z.string(),
+  // .min(8, "Password must be at least 8 characters")
+  // .max(16, "Password must be under 16 characters")
+  // .regex(/[a-z]/, "Must contain at least one lowercase letter")
+  // .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+  // .regex(/[0-9]/, "Must contain at least one number")
+  // .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character"),
 
-    ,role : z
-        .string()
-        .optional()
+  role: z.string().optional(),
 });
 
 const loginDto = z.object({
@@ -43,17 +39,13 @@ const loginDto = z.object({
     .toLowerCase()
     .max(322, "email is too long!"),
 
-  password: z
-    .string()
-    // .min(8, "Password must be at least 8 characters")
-    // .max(16, "Password must be under 16 characters")
-    // .regex(/[a-z]/, "Must contain at least one lowercase letter")
-    // .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-    // .regex(/[0-9]/, "Must contain at least one number")
-    // .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character"),
-})
+  password: z.string(),
+  // .min(8, "Password must be at least 8 characters")
+  // .max(16, "Password must be under 16 characters")
+  // .regex(/[a-z]/, "Must contain at least one lowercase letter")
+  // .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+  // .regex(/[0-9]/, "Must contain at least one number")
+  // .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character"),
+});
 
-export {
-    registerDto,
-    loginDto
-}
+export { registerDto, loginDto };
