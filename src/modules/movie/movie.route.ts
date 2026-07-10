@@ -7,7 +7,7 @@ const movieRouter = Router()
 
 //public route
 movieRouter.get("/", asyncHandler(MovieController.getMoviesController))
-movieRouter.get("/:id", asyncHandler(MovieController.getMovieByIdController))
+movieRouter.get("/:movieId", asyncHandler(MovieController.getMovieByIdController))
 
 //admin route
 movieRouter.post("/", authenticateUser, authorizeAdmin, asyncHandler(MovieController.registerMovieControler))

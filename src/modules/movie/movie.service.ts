@@ -81,4 +81,20 @@ const getMoviesService = async () => {
     return moviesResult.rows
 };
 
-export { registerMovieService, getMoviesService };
+const getMovieByIdService = async(movieId ) => {
+    const getMovieQuery = `
+        SELECT id, title, description, duration_in_minutes, thumbnail_url, total_seats, created_by 
+        FROM movies
+        WHERE id=$1
+    `
+
+    const getMovieResult = await pool.query(getMovieQuery, [movieId])
+
+    if(getMovieResult.rows.length === 0){
+        throw ApiError.notFound("Invalid id or movie does not exists!")
+    }
+
+    return getMovieResult.rows[0]
+}
+
+export { registerMovieService, getMoviesService,getMovieByIdService };
