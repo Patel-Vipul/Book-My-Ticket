@@ -65,7 +65,7 @@ const loginService = async (payload) => {
     throw ApiError.unauthorized("Invalid email or password");
   }
 
-  const accessToken = generateAccessToken({ id: user.id, email });
+  const accessToken = generateAccessToken({ id: user.id, email, role: user.role });
   const refreshToken = generateRefreshToken({ id: user.id });
 
   const hashedRefreshToken = await hashToken(refreshToken);
@@ -111,6 +111,7 @@ const refreshTokenService = async (payload) => {
   const newAccessToken = generateAccessToken({
     id: user.id,
     email: user.email,
+    role : user.role
   });
   const newRefreshToken = generateRefreshToken({ id: user.id });
 
@@ -124,7 +125,7 @@ const refreshTokenService = async (payload) => {
 
 const logoutService = async (payload) => {
 
-  const { user_id, user_email } = payload
+  const { user_id } = payload
 
   await pool.query("UPDATE users SET refresh_token=NULL WHERE id=$1",[user_id])
 

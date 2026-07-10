@@ -8,7 +8,8 @@ const REFRESH_EXPIRY = process.env.JWT_REFRESH_SECRET_EXPIRY
 
 type AccessTokenPayload = {
     id : string,
-    email : string
+    email : string,
+    role : string
 }
 
 type RefreshTokenPayload = {
