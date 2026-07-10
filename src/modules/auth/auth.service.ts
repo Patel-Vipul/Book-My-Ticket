@@ -122,4 +122,13 @@ const refreshTokenService = async (payload) => {
   return { newAccessToken, newRefreshToken };
 };
 
-export { registerService, loginService, refreshTokenService };
+const logoutService = async (payload) => {
+
+  const { user_id, user_email } = payload
+
+  await pool.query("UPDATE users SET refresh_token=NULL WHERE id=$1",[user_id])
+
+  return 
+};
+
+export { registerService, loginService, refreshTokenService, logoutService };

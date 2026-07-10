@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { loginDto, registerDto } from "./auth.dto.js";
 import {
   loginService,
+  logoutService,
   refreshTokenService,
   registerService,
 } from "./auth.service.js";
@@ -67,7 +68,30 @@ class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 10000,
     });
 
-    ApiResponse.ok(res, {newAccessToken}, "Access-token refreshed successfully!");
+    ApiResponse.ok(
+      res,
+      { newAccessToken },
+      "Access-token refreshed successfully!",
+    );
+    return;
+  }
+
+  static async logoutController(req: Request, res: Response) {
+    //@ts-ignore
+    if (!req?.user) {
+      throw ApiError.unauthorized("Authentication required");
+    }
+
+    //@ts-ignore
+    await logoutService(req.user);
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    ApiResponse.ok(res, [], "logout successfully!");
     return;
   }
 }
