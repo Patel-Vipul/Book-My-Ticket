@@ -76,25 +76,48 @@ const getMoviesService = async () => {
         FROM movies;
     `;
 
-    const moviesResult = await pool.query(movieQuery)
+  const moviesResult = await pool.query(movieQuery);
 
-    return moviesResult.rows
+  return moviesResult.rows;
 };
 
-const getMovieByIdService = async(movieId ) => {
-    const getMovieQuery = `
+const getMovieByIdService = async (movieId) => {
+  const getMovieQuery = `
         SELECT id, title, description, duration_in_minutes, thumbnail_url, total_seats, created_by 
         FROM movies
         WHERE id=$1
-    `
+    `;
 
-    const getMovieResult = await pool.query(getMovieQuery, [movieId])
+  const getMovieResult = await pool.query(getMovieQuery, [movieId]);
 
-    if(getMovieResult.rows.length === 0){
-        throw ApiError.notFound("Invalid id or movie does not exists!")
+  if (getMovieResult.rows.length === 0) {
+    throw ApiError.notFound("Invalid id or movie does not exists!");
+  }
+
+  return getMovieResult.rows[0];
+};
+
+const getSeatsService = async (movieId) => {
+  const getSeatsQuery = `
+        SELECT id, seat_number, is_available, movie_id FROM seats WHERE movie_id=$1
+    `;
+  const getSeatsResult = await pool.query(getSeatsQuery, [movieId])
+
+  if(getSeatsResult.rows.length === 0){
+    throw ApiError.notFound("invalid movieId or movie/seats deleted")
+  }
+
+  return getSeatsResult.rows
+};
+
+const getSeatByIdService = async(seatId) => {
+    const getSeatResult = await pool.query("SELECT id, seat_number, is_available FROM seats WHERE id=$1", [seatId])
+
+    if(getSeatResult.rows.length === 0){
+        throw ApiError.notFound("Invalid seat id")
     }
 
-    return getMovieResult.rows[0]
+    return getSeatResult.rows[0]
 }
 
-export { registerMovieService, getMoviesService,getMovieByIdService };
+export { registerMovieService, getMoviesService, getMovieByIdService, getSeatsService, getSeatByIdService };

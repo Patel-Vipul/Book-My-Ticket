@@ -4,7 +4,9 @@ import ApiError from "../../common/utils/api.error.js";
 import {
   getMovieByIdService,
   getMoviesService,
+  getSeatsService,
   registerMovieService,
+  getSeatByIdService
 } from "./movie.service.js";
 import ApiResponse from "../../common/utils/api.response.js";
 
@@ -36,6 +38,7 @@ class MovieController {
     }
 
     ApiResponse.ok(res, movies, "Movies fetched Successfully!");
+    return;
   }
 
   static async getMovieByIdController(req: Request, res: Response) {
@@ -44,6 +47,25 @@ class MovieController {
     const movie = await getMovieByIdService(movieId);
 
     ApiResponse.ok(res, movie, "Movie fetched successfully!");
+    return;
+  }
+
+  static async getSeatsController(req: Request, res: Response) {
+    const movieId = req.params?.movieId;
+
+    const seats = await getSeatsService(movieId);
+
+    ApiResponse.ok(res, seats, "All seats are fetched");
+    return;
+  }
+
+  static async getSeatByIdController(req: Request, res: Response) {
+    const seatId = req.params?.seatId;
+
+    const seat = await getSeatByIdService(seatId);
+
+    ApiResponse.ok(res, seat, "seat is fetched successfully!");
+    return;
   }
 }
 
