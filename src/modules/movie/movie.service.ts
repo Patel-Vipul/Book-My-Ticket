@@ -14,9 +14,9 @@ const registerMovieService = async (payload, creatorId) => {
     const movieId = crypto.randomUUID();
 
     const insertMovieQuery = `
-            INSERT INTO movies (id,title,description, duration_in_minutes,thumbnail_url,total_seats, created_by)
+            INSERT INTO movies (id,title,description, duration_in_minutes,thumnail_url,total_seats, created_by)
             VALUES ($1,$2,$3,$4,$5,$6,$7)
-            RETURNING id, title, description, duration_in_minutes, thumbnail_url, total_seats, created_by;
+            RETURNING id, title, description, duration_in_minutes, thumnail_url, total_seats, created_by;
         `;
 
     const insertMovieResult = await client.query(insertMovieQuery, [
@@ -72,7 +72,7 @@ const registerMovieService = async (payload, creatorId) => {
 
 const getMoviesService = async () => {
   const movieQuery = `
-        SELECT id, title, description, duration_in_minutes, thumbnail_url, total_seats, created_by
+        SELECT id, title, description, duration_in_minutes, thumnail_url, total_seats, created_by
         FROM movies;
     `;
 
@@ -83,7 +83,7 @@ const getMoviesService = async () => {
 
 const getMovieByIdService = async (movieId) => {
   const getMovieQuery = `
-        SELECT id, title, description, duration_in_minutes, thumbnail_url, total_seats, created_by 
+        SELECT id, title, description, duration_in_minutes, thumnail_url, total_seats, created_by 
         FROM movies
         WHERE id=$1
     `;
@@ -101,23 +101,108 @@ const getSeatsService = async (movieId) => {
   const getSeatsQuery = `
         SELECT id, seat_number, is_available, movie_id FROM seats WHERE movie_id=$1
     `;
-  const getSeatsResult = await pool.query(getSeatsQuery, [movieId])
+  const getSeatsResult = await pool.query(getSeatsQuery, [movieId]);
 
-  if(getSeatsResult.rows.length === 0){
-    throw ApiError.notFound("invalid movieId or movie/seats deleted")
+  if (getSeatsResult.rows.length === 0) {
+    throw ApiError.notFound("invalid movieId or movie/seats deleted");
   }
 
-  return getSeatsResult.rows
+  return getSeatsResult.rows;
 };
 
-const getSeatByIdService = async(seatId) => {
-    const getSeatResult = await pool.query("SELECT id, seat_number, is_available FROM seats WHERE id=$1", [seatId])
+const getSeatByIdService = async (seatId) => {
+  const getSeatResult = await pool.query(
+    "SELECT id, seat_number, is_available FROM seats WHERE id=$1",
+    [seatId],
+  );
 
-    if(getSeatResult.rows.length === 0){
-        throw ApiError.notFound("Invalid seat id")
-    }
+  if (getSeatResult.rows.length === 0) {
+    throw ApiError.notFound("Invalid seat id");
+  }
 
-    return getSeatResult.rows[0]
+  return getSeatResult.rows[0];
+};
+
+const updateMoviePutService = async (payload, movieId, userId) => {
+  const {
+    title,
+    description,
+    durationInMinutes,
+    thumbnailUrl,
+    totalSeats
+  } = payload;
+
+  const updateMovieQuery = `
+        UPDATE movies 
+        SET 
+            title = $1,
+            description = $2,
+            duration_in_minutes = $3,
+            thumnail_url = $4,
+            total_seats = $5,
+            updated_by = $6
+        WHERE id = $7
+        RETURNING id, title, description, duration_in_minutes, thumnail_url, total_seats, created_by, updated_by
+    `;
+
+  const updateMovieResult = await pool.query(updateMovieQuery, [
+    title,
+    description,
+    durationInMinutes,
+    thumbnailUrl,
+    totalSeats,
+    userId,
+    movieId,
+  ]);
+
+
+  if (updateMovieResult.rows.length === 0) {
+    throw ApiError.notFound("invalid movie id or movie is deleted");
+  }
+
+  return updateMovieResult.rows[0];
+};
+
+const updateMoviePatchService = async (payload, movieId, userId) => {
+  const keys = Object.keys(payload);
+  const values = Object.values(payload);
+
+  const setClause = keys
+    .map((key, index) => `${key}=$${index + 1}`)
+    .join(", ");
+  const updateMovieQuery = `
+        UPDATE movies 
+        SET ${setClause}, updated_by = $${keys.length + 1}
+        WhERE id = $${keys.length + 2}
+        RETURNING id, title, duration_in_minutes, thumnail_url, total_seats, created_by, updated_by
+    `;
+
+  const updateMovieResult = await pool.query(updateMovieQuery, [...values, userId, movieId]);
+
+  if(updateMovieResult.rows.length === 0){
+    throw ApiError.notFound("invalid movie id or movie is deleted!")
+  }
+
+  return updateMovieResult.rows[0]
+};
+
+const deleteMovieService = async (movieId) => {
+    const deletMovieQuery = `
+        DELETE FROM movies WHERE id=$1
+    `;
+
+    const movieQueryResult = await pool.query(deletMovieQuery,[movieId])
+
+    return movieQueryResult.rows[0]
 }
 
-export { registerMovieService, getMoviesService, getMovieByIdService, getSeatsService, getSeatByIdService };
+export {
+  registerMovieService,
+  getMoviesService,
+  getMovieByIdService,
+  getSeatsService,
+  getSeatByIdService,
+  updateMoviePutService,
+  updateMoviePatchService,
+  deleteMovieService
+};

@@ -15,6 +15,7 @@ import ApiResponse from "../../common/utils/api.response.js";
 
 class MovieController {
   static async registerMovieControler(req: Request, res: Response) {
+
     const validatedBody = await registerMovieDto.safeParseAsync(req.body);
 
     if (!validatedBody.success) {
@@ -108,6 +109,7 @@ class MovieController {
     const userId = req?.user.user_id;
     const movieId = req.params?.movieId;
 
+    console.log("done 3")
     const updatedMovie = await updateMoviePatchService(
       validatedBody.data,
       movieId,
@@ -121,7 +123,12 @@ class MovieController {
   static async deleteMovieController(req: Request, res: Response) {
     const movieId = req.params?.movieId;
 
-    await deleteMovieService(movieId);
+    const movie = await deleteMovieService(movieId);
+
+    if(!movie){
+      ApiResponse.ok(res,[], "movie is already deleted or doesnot exists")
+      return
+    }
 
     ApiResponse.ok(res, [], "Movie is deleted successfully!");
     return;

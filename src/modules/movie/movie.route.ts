@@ -13,5 +13,8 @@ movieRouter.get("/:movieId/seats/:seatId",asyncHandler(MovieController.getSeatBy
 
 //admin route
 movieRouter.post("/", authenticateUser, authorizeAdmin, asyncHandler(MovieController.registerMovieControler))
+movieRouter.put("/:movieId", authenticateUser, authorizeAdmin, asyncHandler(MovieController.updateMoviePutController))
+movieRouter.patch("/:movieId", authenticateUser, authorizeAdmin, asyncHandler(MovieController.updateMoviePatchController))
+movieRouter.delete("/:movieId", authenticateUser, authorizeAdmin, asyncHandler(MovieController.deleteMovieController))
 
 export default movieRouter;

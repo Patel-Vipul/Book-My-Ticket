@@ -65,7 +65,11 @@ const loginService = async (payload) => {
     throw ApiError.unauthorized("Invalid email or password");
   }
 
-  const accessToken = generateAccessToken({ id: user.id, email, role: user.role });
+  const accessToken = generateAccessToken({
+    id: user.id,
+    email,
+    role: user.role,
+  });
   const refreshToken = generateRefreshToken({ id: user.id });
 
   const hashedRefreshToken = await hashToken(refreshToken);
@@ -74,6 +78,7 @@ const loginService = async (payload) => {
   await pool.query(updateUserQuery, [hashedRefreshToken, user.id]);
 
   const safeUser = {
+    id: user.id,
     first_name: user.first_name,
     last_name: user.last_name,
     email: email,
@@ -111,7 +116,7 @@ const refreshTokenService = async (payload) => {
   const newAccessToken = generateAccessToken({
     id: user.id,
     email: user.email,
-    role : user.role
+    role: user.role,
   });
   const newRefreshToken = generateRefreshToken({ id: user.id });
 
@@ -124,12 +129,13 @@ const refreshTokenService = async (payload) => {
 };
 
 const logoutService = async (payload) => {
+  const { user_id } = payload;
 
-  const { user_id } = payload
+  await pool.query("UPDATE users SET refresh_token=NULL WHERE id=$1", [
+    user_id,
+  ]);
 
-  await pool.query("UPDATE users SET refresh_token=NULL WHERE id=$1",[user_id])
-
-  return 
+  return;
 };
 
 export { registerService, loginService, refreshTokenService, logoutService };
