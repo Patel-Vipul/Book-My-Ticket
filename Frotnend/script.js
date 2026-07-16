@@ -1,5 +1,5 @@
 // ── CONFIG ────────────────────────────────────────────────────
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "https://book-my-ticket-yz80.onrender.com";
 
 // ── STATE ─────────────────────────────────────────────────────
 const state = {
