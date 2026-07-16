@@ -5,6 +5,7 @@ import errorHandler from "../common/middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
 import cors from "cors"
 import movieRouter from "./movie/movie.route.js";
+import bookingRouter from "./booking/booking.route.js";
 
 const expressApplication = (): Express => {
   const app = express();
@@ -20,6 +21,9 @@ const expressApplication = (): Express => {
 
   //movie-router
   app.use("/movies",movieRouter)
+
+  //booking-router
+  app.use("/bookings", bookingRouter)
 
   app.use(errorHandler)
 

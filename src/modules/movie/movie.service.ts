@@ -30,6 +30,7 @@ const registerMovieService = async (payload, creatorId) => {
     ]);
 
     const movie = insertMovieResult.rows[0];
+    console.log(movie)
 
     const rows = ["A", "B", "C", "D", "E"];
     const seatRows = 5;

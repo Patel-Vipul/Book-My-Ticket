@@ -40,3 +40,16 @@ CREATE TABLE seats (
 
     UNIQUE(movie_id, seat_number)
 )
+
+CREATE TABLE Bookings (
+    id UUID PRIMARY KEY,
+    status VARCHAR(20) DEFAULT 'pending',
+    expired_at TIMESTAMP NULL,
+    confirmed_at TIMESTAMP NULL,
+
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    seat_id UUID NOT NULL REFERENCES seats(id) ON DELETE CASCADE,
+
+    created_at TIMESTAMP DEFAULT NOW()
+    updated_at TIMESTAMP 
+);
