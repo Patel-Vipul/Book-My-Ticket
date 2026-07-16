@@ -13,7 +13,7 @@ const expressApplication = (): Express => {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser())
   app.use(cors({
-    origin : "*",
+    origin : "https://book-my-ticket-yz80.onrender.com",
     credentials : true
   }))
   //auth router
