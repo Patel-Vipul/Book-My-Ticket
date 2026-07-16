@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CineBook</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap"
+      rel="stylesheet" />
+    <link href="index.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- ── NAVBAR ──────────────────────────────────────────────── -->
+    <nav class="navbar">
+      <button class="navbar-brand" onclick="navigate('movies')">
+        CineBook
+      </button>
+      <div class="navbar-actions">
+        <button class="nav-link" onclick="navigate('movies')">Movies</button>
+        <button
+          class="nav-link hidden"
+          id="nav-bookings"
+          onclick="navigate('bookings')">
+          My Bookings
+        </button>
+        <button
+          class="nav-link hidden"
+          id="nav-admin"
+          onclick="navigate('admin')">
+          Admin
+        </button>
+        <div class="user-pill hidden" id="user-pill">
+          <div class="user-avatar" id="user-avatar"></div>
+          <span id="user-name"></span>
+        </div>
+        <button
+          class="btn-nav-primary hidden"
+          id="nav-logout"
+          onclick="handleLogout()">
+          Logout
+        </button>
+        <button
+          class="btn-nav-primary"
+          id="nav-login"
+          onclick="navigate('auth')">
+          Sign In
+        </button>
+      </div>
+    </nav>
+
+    <!-- ── PAGES ───────────────────────────────────────────────── -->
+
+    <!-- MOVIES PAGE -->
+    <div class="page active" id="page-movies">
+      <div class="movies-hero">
+        <h1>What are you<br /><span>watching tonight?</span></h1>
+        <p>Book seats for the latest releases — instantly.</p>
+      </div>
+      <div id="movies-container" class="movies-grid"></div>
+    </div>
+
+    <!-- SEATS PAGE -->
+    <div class="page" id="page-seats">
+      <div class="seats-page">
+        <div class="seats-header">
+          <button class="seats-back" onclick="navigate('movies')">
+            ← Back to movies
+          </button>
+          <h1 class="seats-movie-title" id="seats-movie-title">Movie Title</h1>
+          <p class="seats-movie-meta" id="seats-movie-meta">Duration</p>
+        </div>
+        <div class="screen-bar"></div>
+        <p class="screen-label">Screen</p>
+        <div class="seats-legend">
+          <div class="legend-item">
+            <div class="legend-dot available"></div>
+            Available
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot selected"></div>
+            Selected
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot pending"></div>
+            Reserved
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot booked"></div>
+            Booked
+          </div>
+        </div>
+        <div id="seats-container" class="seats-grid"></div>
+        <div class="booking-bar">
+          <div class="booking-bar-info">
+            <div id="selected-seat-info">Select a seat to continue</div>
+          </div>
+          <button
+            class="btn-confirm-booking"
+            id="btn-proceed"
+            disabled
+            onclick="handleProceedBooking()">
+            Reserve Seat
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTH PAGE -->
+    <div class="page" id="page-auth">
+      <div class="auth-page">
+        <div class="auth-card">
+          <h1 class="auth-title">Welcome back</h1>
+          <p class="auth-subtitle">Sign in to book your seats</p>
+          <div class="auth-tabs">
+            <button
+              class="auth-tab active"
+              id="tab-login"
+              onclick="switchAuthTab('login')">
+              Sign In
+            </button>
+            <button
+              class="auth-tab"
+              id="tab-register"
+              onclick="switchAuthTab('register')">
+              Register
+            </button>
+          </div>
+
+          <!-- Login Form -->
+          <div id="form-login">
+            <div id="login-error" class="form-error hidden"></div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input
+                class="form-input"
+                type="email"
+                id="login-email"
+                placeholder="you@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input
+                class="form-input"
+                type="password"
+                id="login-password"
+                placeholder="••••••••" />
+            </div>
+            <button class="btn-auth" onclick="handleLogin()">Sign In</button>
+          </div>
+
+          <!-- Register Form -->
+          <div id="form-register" class="hidden">
+            <div id="register-error" class="form-error hidden"></div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="reg-firstName"
+                  placeholder="John" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="reg-lastName"
+                  placeholder="Doe" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input
+                class="form-input"
+                type="email"
+                id="reg-email"
+                placeholder="you@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input
+                class="form-input"
+                type="password"
+                id="reg-password"
+                placeholder="Min 8 characters" />
+            </div>
+            <div class="form-group hidden">
+              <label class="form-label">Role</label>
+              <select class="form-select" id="reg-role">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <button class="btn-auth" onclick="handleRegister()">
+              Create Account
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY BOOKINGS PAGE -->
+    <div class="page" id="page-bookings">
+      +
+      <div class="bookings-page">
+        <h1>My Bookings</h1>
+        <p>All your reservations in one place</p>
+        <div id="bookings-container"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN PAGE -->
+    <div class="page" id="page-admin">
+      <div class="admin-page">
+        <h1>Admin Panel</h1>
+        <p>Manage movies and seats</p>
+
+        <!-- Add Movie Form -->
+        <div class="admin-section">
+          <h2>Add New Movie</h2>
+          <div id="admin-form-error" class="form-error hidden"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Title</label>
+              <input
+                class="form-input"
+                type="text"
+                id="admin-title"
+                placeholder="Movie title" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration (minutes)</label>
+              <input
+                class="form-input"
+                type="number"
+                id="admin-duration"
+                placeholder="148" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea
+              class="form-input"
+              id="admin-description"
+              rows="3"
+              placeholder="Movie description..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Thumbail-url</label>
+            <input
+              class="form-input"
+              type="url"
+              id="admin-thumbnail"
+              placeholder="http://image.tmbs.org/..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total Seats</label>
+            <input
+              class="form-input"
+              type="number"
+              id="admin-seats"
+              placeholder="25"
+              value="25" />
+          </div>
+          <button
+            class="btn-auth"
+            style="margin-top: 0"
+            onclick="handleCreateMovie()">
+            Add Movie
+          </button>
+        </div>
+
+        <!-- Movie List -->
+        <div class="admin-section">
+          <h2>All Movies</h2>
+          <div id="admin-movies-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PENDING BOOKING MODAL ────────────────────────────────── -->
+    <div class="modal-overlay hidden" id="pending-modal">
+      <div class="modal">
+        <h2 class="modal-title">Seat Reserved! 🎬</h2>
+        <p class="modal-subtitle">
+          Confirm your booking before the timer runs out
+        </p>
+        <div class="timer-ring">
+          <div class="timer-display" id="timer-display">10:00</div>
+          <div class="timer-label">Time remaining</div>
+        </div>
+        <div class="modal-booking-detail">
+          <p>Movie <span id="modal-movie-name">—</span></p>
+          <p>Seat <span id="modal-seat-number">—</span></p>
+          <p>
+            Booking ID
+            <span id="modal-booking-id" style="font-size: 11px">—</span>
+          </p>
+        </div>
+        <div class="modal-actions">
+          <button
+            class="btn-modal-secondary"
+            onclick="handleCancelPendingBooking()">
+            Cancel
+          </button>
+          <button class="btn-modal-primary" onclick="handleConfirmBooking()">
+            Confirm Booking
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TOAST CONTAINER ──────────────────────────────────────── -->
+    <div class="toast-container" id="toast-container"></div>
+  </body>
+  <script src="script.js"></script>
+</html>
